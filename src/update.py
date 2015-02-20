@@ -20,8 +20,6 @@ class RSS2Pocket:
         # Don't do anything if in fake mode
         #
 
-        fake = True
-
         if fake:
             return True
 
