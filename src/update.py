@@ -10,6 +10,7 @@ import configparser
 class RSS2Pocket:
 
     config = None
+    send_to_pocket_flag = True
 
     def send_to_pocket(self, name, url_feed, fake):
 
@@ -20,7 +21,8 @@ class RSS2Pocket:
         # Don't do anything if in fake mode
         #
 
-        if fake:
+        if not self.send_to_pocket_flag:
+            print("Not really sending to pocket, fake mode active")
             return True
 
         try:
@@ -29,6 +31,11 @@ class RSS2Pocket:
         except:
             print("Cannot read Pocket data from config.ini")
             return False
+
+        try:
+            self.send_to_pocket_flag = self.config["Pocket"]["send_to_pocket"].lower() != "no"
+        except:
+            pass
 
         METHOD_URL = 'https://getpocket.com/v3/'
         REQUEST_HEADERS = { 'X-Accept': 'application/json' }
@@ -75,7 +82,24 @@ class RSS2Pocket:
         #
         # get the feed data from the url
         #
-        feed = feedparser.parse(url)
+
+        feed_request = urllib.request.Request(url)
+
+        try:
+            feed_resp = urllib.request.urlopen(feed_request)
+            line = feed_resp.readline().decode('utf-8')
+            feed_read = ""
+            while line:
+                if line != '\n' and line != '\r\n':
+                    feed_read += str(line)
+                else:
+                    pass
+                line = feed_resp.readline().decode('utf-8')
+        except Exception as e:
+            print(e)
+            return False
+
+        feed = feedparser.parse(feed_read)
 
         #
         # figure out which posts to print
