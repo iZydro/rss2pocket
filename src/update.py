@@ -83,7 +83,9 @@ class RSS2Pocket:
         # get the feed data from the url
         #
 
-        feed_request = urllib.request.Request(url)
+
+        '''
+        feed_request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla'})
 
         try:
             feed_resp = urllib.request.urlopen(feed_request)
@@ -100,6 +102,9 @@ class RSS2Pocket:
             return False
 
         feed = feedparser.parse(feed_read)
+        '''
+
+        feed = feedparser.parse(url)
 
         #
         # figure out which posts to print
